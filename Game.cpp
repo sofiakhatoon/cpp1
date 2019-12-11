@@ -2,9 +2,11 @@
 //
 
 #include "stdafx.h"
+#include <string>
 #include "Game.h"
+using std::string;
 
-#define MAX_LOADSTRING 100
+#define MAX_LOADSTRING 1000
 
 // Global Variables:
 HINSTANCE hInst;                                // current instance
@@ -110,6 +112,13 @@ BOOL InitInstance(HINSTANCE hInstance, int nCmdShow)
 
    return TRUE;
 }
+LPWSTR ConvertToLPWSTR(const std::string& s)
+{
+	LPWSTR ws = new wchar_t[s.size() + 1]; // +1 for zero at the end
+	copy(s.begin(), s.end(), ws);
+	ws[s.size()] = 0; // zero at the end
+	return ws;
+}
 
 //
 //  FUNCTION: WndProc(HWND, UINT, WPARAM, LPARAM)
@@ -144,9 +153,50 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
         break;
     case WM_PAINT:
         {
+		//std::string From = "sofiakhatoon\0";
+		//std::wstring To(From.begin(), From.end());
+		//LPCWSTR Last = To.c_str();
+		std::string s = "sofia khatoon\0";
+		LPWSTR ws = ConvertToLPWSTR(s);
+
+		LPCWSTR wide_string = new WCHAR[4 + 1];; //define an array with size of my_str + 1
+		//wide_string = my_str.c_str();
             PAINTSTRUCT ps;
             HDC hdc = BeginPaint(hWnd, &ps);
             // TODO: Add any drawing code that uses hdc here...
+			//hDC = BeginPaint(hwnd, &paintStruct);
+			/*  Set txt color to blue*/
+
+			RECT rct;
+
+			rct.left = 10;
+			rct.right = 100;
+			rct.top = 150;
+			rct.bottom = 200;
+			HBRUSH blueBrush = CreateSolidBrush(RGB(0, 255, 0));
+			RECT clientRect;
+
+			GetClientRect(hWnd, &clientRect);
+
+			FillRect(hdc, &clientRect, blueBrush);
+
+			SetTextColor(hdc, COLORREF(0x00FF0000));
+			/*  Display text in middle of window*/
+			
+			TextOut(hdc, 50, 50, ws, wcslen(ws)); 
+
+			HBRUSH mxBrush = CreateSolidBrush(RGB(255, 255, 0));
+			FillRect(hdc, &rct, mxBrush);
+			POINT pntArray[2];
+			pntArray[0].x = rct.bottom;
+			pntArray[0].y = 10;
+			pntArray[1].x = 200;
+			pntArray[1].y = 100;
+
+			Polyline(hdc, pntArray, 2);
+
+			
+			//EndPaint(hWnd, &paintStruct);
             EndPaint(hWnd, &ps);
         }
         break;
@@ -158,7 +208,6 @@ LRESULT CALLBACK WndProc(HWND hWnd, UINT message, WPARAM wParam, LPARAM lParam)
     }
     return 0;
 }
-
 // Message handler for about box.
 INT_PTR CALLBACK About(HWND hDlg, UINT message, WPARAM wParam, LPARAM lParam)
 {
